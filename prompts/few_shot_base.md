@@ -1,3 +1,9 @@
-I want you to classify the text into Negative, Neutral or Positive according to the sentiment.
+Classify the text into Negative, Neutral or Positive according to the sentiment.
 
-here goes the user prompt, use brackets and string format to replace text like here {user_prompt}
+What a beautiful day!//Positive||
+The movie was so boring!//Negative||
+The food was amazing!//Positive||
+Everything went as expected...//Neutral||
+It was an average experience.//Neutral||
+I would not recommend this to anyone!//Negative||
+{user_prompt}//
