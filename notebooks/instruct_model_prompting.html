@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>base_model_prompting</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>instruct_model_prompting</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7516,11 +7516,11 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Prompt-based-Sentiment-Classification">Prompt-based Sentiment Classification<a class="anchor-link" href="#Prompt-based-Sentiment-Classification">¶</a></h1><p>This notebook demonstrates how to perform sentiment classification using a prompt-based approach with the Meta-Llama text generation model. The workflow includes:</p>
+<h1 id="Prompt-based-Sentiment-Classification">Prompt-based Sentiment Classification<a class="anchor-link" href="#Prompt-based-Sentiment-Classification">¶</a></h1><p>This notebook demonstrates how to perform sentiment classification using a prompt-based approach with the finetuned instruct models. The workflow includes:</p>
 <ul>
 <li>Loading a dataset using pandas.</li>
 <li>Generating prompts (both zero-shot and few-shot) from stored Markdown files.</li>
-<li>Sending prompts to an API endpoint for text generation.</li>
+<li>Sending prompts to an OLLAMA endpoint for text generation.</li>
 <li>Parsing and displaying the responses.</li>
 <li>Looping over a subset of the data to compare true sentiment labels with predicted classifications.</li>
 </ul>
@@ -7532,7 +7532,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -7549,7 +7549,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Loading-the-Training-Dataset">Loading the Training Dataset<a class="anchor-link" href="#Loading-the-Training-Dataset">¶</a></h2><p>Adapted from: <a href="https://www.kaggle.com/datasets/abhi8923shriv/sentiment-analysis-dataset?resource=download&amp;select=train.csv">https://www.kaggle.com/datasets/abhi8923shriv/sentiment-analysis-dataset?resource=download&amp;select=train.csv</a></p>
+<h3 id="Loading-the-Training-Dataset">Loading the Training Dataset<a class="anchor-link" href="#Loading-the-Training-Dataset">¶</a></h3><p>Adapted from: <a href="https://www.kaggle.com/datasets/abhi8923shriv/sentiment-analysis-dataset?resource=download&amp;select=train.csv">https://www.kaggle.com/datasets/abhi8923shriv/sentiment-analysis-dataset?resource=download&amp;select=train.csv</a></p>
 </div>
 </div>
 </div>
@@ -7558,11 +7558,156 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">'../data/train_example.csv'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">r</span><span class="s1">'C:\Users\Joao\Desktop\ISAG\2-T\Generative AI\Trabalho 1\materials\data\train_example.csv'</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">train</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Unnamed: 0.1</th>
+<th>Unnamed: 0</th>
+<th>textID</th>
+<th>text</th>
+<th>selected_text</th>
+<th>sentiment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0</td>
+<td>0</td>
+<td>cb774db0d1</td>
+<td>I`d have responded, if I were going</td>
+<td>I`d have responded, if I were going</td>
+<td>neutral</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1</td>
+<td>1</td>
+<td>549e992a42</td>
+<td>Sooo SAD I will miss you here in San Diego!!!</td>
+<td>Sooo SAD</td>
+<td>negative</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2</td>
+<td>2</td>
+<td>088c60f138</td>
+<td>my boss is bullying me...</td>
+<td>bullying me</td>
+<td>negative</td>
+</tr>
+<tr>
+<th>3</th>
+<td>3</td>
+<td>3</td>
+<td>9642c003ef</td>
+<td>what interview! leave me alone</td>
+<td>leave me alone</td>
+<td>negative</td>
+</tr>
+<tr>
+<th>4</th>
+<td>4</td>
+<td>4</td>
+<td>358bd9e861</td>
+<td>Sons of ****, why couldn`t they put them on the releases we already bought</td>
+<td>Sons of ****,</td>
+<td>negative</td>
+</tr>
+<tr>
+<th>5</th>
+<td>5</td>
+<td>5</td>
+<td>28b57f3990</td>
+<td>http://www.dothebouncy.com/smf - some shameless plugging for the best Rangers forum on earth</td>
+<td>http://www.dothebouncy.com/smf - some shameless plugging for the best Rangers forum on earth</td>
+<td>neutral</td>
+</tr>
+<tr>
+<th>6</th>
+<td>6</td>
+<td>6</td>
+<td>6e0c6d75b1</td>
+<td>2am feedings for the baby are fun when he is all smiles and coos</td>
+<td>fun</td>
+<td>positive</td>
+</tr>
+<tr>
+<th>7</th>
+<td>7</td>
+<td>7</td>
+<td>50e14c0bb8</td>
+<td>Soooo high</td>
+<td>Soooo high</td>
+<td>neutral</td>
+</tr>
+<tr>
+<th>8</th>
+<td>8</td>
+<td>8</td>
+<td>e050245fbd</td>
+<td>Both of you</td>
+<td>Both of you</td>
+<td>neutral</td>
+</tr>
+<tr>
+<th>9</th>
+<td>9</td>
+<td>9</td>
+<td>fc2cbefa9d</td>
+<td>Journey!? Wow... u just became cooler.  hehe... (is that possible!?)</td>
+<td>Wow... u just became cooler.</td>
+<td>positive</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -7611,7 +7756,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Previewing-the-Data">Previewing the Data<a class="anchor-link" href="#Previewing-the-Data">¶</a></h2><p>This cell displays all rows of the training dataset, as it is a small one. It helps in inspecting the structure and content of the data, including columns like <code>text</code>, <code>selected_text</code>, and <code>sentiment</code>.</p>
+<h3 id="Previewing-the-Data">Previewing the Data<a class="anchor-link" href="#Previewing-the-Data">¶</a></h3><p>This cell displays the first rows of the training dataset. It helps in inspecting the structure and content of the data, including columns like <code>text</code>, <code>selected_text</code>, and <code>sentiment</code>.</p>
 </div>
 </div>
 </div>
@@ -7767,7 +7912,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Defining-the-chat-Function">Defining the <code>chat</code> Function<a class="anchor-link" href="#Defining-the-chat-Function">¶</a></h2><p>This cell defines a function named <code>chat</code> that sends a prompt to a text generation API using the Meta-Llama model. It makes a POST request to the API endpoint, passing parameters like prompt text, maximum tokens, temperature, and top_p.</p>
+<h3 id="Defining-the-chat-Function">Defining the <code>chat</code> Function<a class="anchor-link" href="#Defining-the-chat-Function">¶</a></h3><p>This cell defines a function named <code>chat</code> that sends a prompt to a text generation API using the Meta-Llama model. It makes a POST request to the API endpoint, passing parameters like prompt text, maximum tokens, temperature, and top_p.</p>
 </div>
 </div>
 </div>
@@ -7776,11 +7921,11 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">HYPERBOLIC_AUTH</span> <span class="o">=</span> <span class="s2">"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2FvbXI4MTBAZ21haWwuY29tIiwiaWF0IjoxNzQzNDM4NjMxfQ.obsnhIjgtiQPs0579ZDCZv3dVfhNoZkbQ1S2ZhgG-tM"</span>
-<span class="n">MODEL</span> <span class="o">=</span> <span class="s2">"meta-llama/Meta-Llama-3.1-405B"</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">OLLAMA_URL</span> <span class="o">=</span> <span class="s2">"http://localhost:11434/"</span>
+<span class="n">OLLAMA_MODEL</span> <span class="o">=</span> <span class="s2">"llama3.2"</span>
 </pre></div>
 </div>
 </div>
@@ -7791,68 +7936,40 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">import</span> <span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">retry</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">exceptions</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Retry Decorator</span>
-<span class="sd">    Retries the wrapped function/method `times` times if the exceptions listed</span>
-<span class="sd">    in ``exceptions`` are thrown</span>
-<span class="sd">    :param times: The number of times to repeat the wrapped function/method</span>
-<span class="sd">    :type times: Int</span>
-<span class="sd">    :param Exceptions: Lists of exceptions that trigger a retry attempt</span>
-<span class="sd">    :type Exceptions: Tuple of Exceptions</span>
-<span class="sd">    """</span>
-    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">newfn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">while</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">times</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">exceptions</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span>
-                        <span class="s1">'Exception </span><span class="si">%s</span><span class="s1"> thrown when attempting to run </span><span class="si">%s</span><span class="s1">, attempt '</span>
-                        <span class="s1">'</span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1">. We</span><span class="se">\'</span><span class="s1">ll wait 20seconds.'</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">attempt</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>
-                    <span class="p">)</span>
-                    <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">newfn</span>
-    <span class="k">return</span> <span class="n">decorator</span>
-
-<span class="k">class</span> <span class="nc">TooManyRequests</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">pass</span>
-
-<span class="nd">@retry</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">exceptions</span><span class="o">=</span><span class="p">(</span><span class="n">TooManyRequests</span><span class="p">,))</span>
-<span class="k">def</span> <span class="nf">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="s2">"https://api.hyperbolic.xyz/v1/completions"</span>
+<span class="k">def</span> <span class="nf">chat</span><span class="p">(</span><span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">OLLAMA_URL</span><span class="si">}</span><span class="s2">/v1/chat/completions"</span>
     <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
-        <span class="s2">"Authorization"</span><span class="p">:</span> <span class="n">HYPERBOLIC_AUTH</span>
     <span class="p">}</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
-        <span class="s2">"model"</span><span class="p">:</span> <span class="n">MODEL</span><span class="p">,</span>
+        <span class="s2">"messages"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">"role"</span><span class="p">:</span><span class="s2">"system"</span><span class="p">,</span>
+                <span class="s2">"content"</span><span class="p">:</span> <span class="n">system_prompt</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">"role"</span><span class="p">:</span><span class="s2">"user"</span><span class="p">,</span>
+                <span class="s2">"content"</span><span class="p">:</span> <span class="n">user_prompt</span>
+            <span class="p">}</span>
+        <span class="p">],</span>
+        <span class="s2">"model"</span><span class="p">:</span> <span class="n">OLLAMA_MODEL</span><span class="p">,</span>
         <span class="s2">"max_tokens"</span><span class="p">:</span> <span class="n">max_tokens</span><span class="p">,</span>
         <span class="s2">"temperature"</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
         <span class="s2">"top_p"</span><span class="p">:</span> <span class="mf">0.9</span>
     <span class="p">}</span>
-
+    
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="o">==</span><span class="mi">200</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"choices"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="o">==</span><span class="mi">429</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">TooManyRequests</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"choices"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">"message"</span><span class="p">][</span><span class="s2">"content"</span><span class="p">],</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-<span class="n">message</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="s2">"say blue."</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="n">message</span><span class="p">,</span> <span class="n">response</span>
+<span class="n">chat</span><span class="p">(</span><span class="n">system_prompt</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
+     <span class="n">user_prompt</span><span class="o">=</span><span class="s2">"say blue."</span><span class="p">,</span>
+     <span class="n">max_tokens</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7863,19 +7980,18 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[40]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>(' say red. say yellow. say green. say purple. say orange. say white. say black',
- {'id': 'cmpl-bed0e19bdcc7441496ad847272fd9160',
-  'choices': [{'finish_reason': 'length',
-    'index': 0,
-    'logprobs': None,
-    'text': ' say red. say yellow. say green. say purple. say orange. say white. say black'}],
-  'created': 1743605138,
-  'model': 'meta-llama/Meta-Llama-3.1-405B',
-  'system_fingerprint': '',
-  'object': 'text_completion',
-  'usage': {'prompt_tokens': 2, 'total_tokens': 22, 'completion_tokens': 20}})</pre>
+<pre>('Blue',
+ {'id': 'chatcmpl-331',
+  'object': 'chat.completion',
+  'created': 1743600641,
+  'model': 'llama3.2',
+  'system_fingerprint': 'fp_ollama',
+  'choices': [{'index': 0,
+    'message': {'role': 'assistant', 'content': 'Blue'},
+    'finish_reason': 'stop'}],
+  'usage': {'prompt_tokens': 28, 'completion_tokens': 2, 'total_tokens': 30}})</pre>
 </div>
 </div>
 </div>
@@ -7887,37 +8003,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Defining-the-get_prompt-Function">Defining the <code>get_prompt</code> Function<a class="anchor-link" href="#Defining-the-get_prompt-Function">¶</a></h2><p>This cell defines a helper function <code>get_prompt</code> that reads a Markdown file (located in the <code>../../prompts/</code> directory) corresponding to a system prompt. It then formats the prompt by inserting the provided user text.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-
-<span class="n">current_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Diretório atual:"</span><span class="p">,</span> <span class="n">current_directory</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Diretório atual: c:\Users\Joao\Desktop\ISAG\2-T\Generative AI\Trabalho 1\materials\notebooks
-</pre>
-</div>
+<h3 id="Defining-the-get_prompt-Function">Defining the <code>get_prompt</code> Function<a class="anchor-link" href="#Defining-the-get_prompt-Function">¶</a></h3><p>This cell defines a helper function <code>get_prompt</code> that reads a Markdown file (located in the <code>../../prompts/</code> directory) corresponding to a system prompt. It then formats the prompt by inserting the provided user text.</p>
 </div>
 </div>
 </div>
@@ -7926,15 +8012,15 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [44]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_prompt</span><span class="p">(</span><span class="n">system_prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_prompt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">".."</span><span class="p">,</span> <span class="s2">"prompts"</span><span class="p">)</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">system_prompt_name</span> <span class="o">+</span> <span class="s2">".md"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_system_prompt</span><span class="p">(</span><span class="n">system_prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="s2">"../prompts/"</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">base_path</span><span class="o">+</span><span class="n">system_prompt_name</span><span class="o">+</span><span class="s2">".md"</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">markdown_string</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">markdown_string</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user_prompt</span><span class="o">=</span><span class="n">user_prompt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">markdown_string</span>
 </pre></div>
 </div>
 </div>
@@ -7947,7 +8033,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Generating-and-Displaying-a-Zero-shot-Prompt">Generating and Displaying a Zero-shot Prompt<a class="anchor-link" href="#Generating-and-Displaying-a-Zero-shot-Prompt">¶</a></h2><p>This cell generates a zero-shot prompt for sentiment classification using the example text "hello friend!" by calling the get_prompt function with the "zero_shot" prompt template. The generated prompt is then displayed.</p>
+<h3 id="Generating-and-Displaying-a-Zero-shot-Prompt">Generating and Displaying a Zero-shot Prompt<a class="anchor-link" href="#Generating-and-Displaying-a-Zero-shot-Prompt">¶</a></h3>
 </div>
 </div>
 </div>
@@ -7956,7 +8042,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [45]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">Markdown</span>
@@ -7970,10 +8056,11 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [46]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">zero_shot_prompt</span> <span class="o">=</span> <span class="n">get_prompt</span><span class="p">(</span><span class="n">system_prompt_name</span><span class="o">=</span><span class="s2">"zero_shot_base"</span><span class="p">,</span> <span class="n">user_prompt</span><span class="o">=</span><span class="s2">"hello friend!"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">zero_shot_prompt</span> <span class="o">=</span> <span class="n">get_system_prompt</span><span class="p">(</span><span class="s2">"zero_shot_instruct"</span><span class="p">)</span>
+
 <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">zero_shot_prompt</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -7987,9 +8074,10 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>Classify the text into neutral, negative or positive.</p>
-<p>Text: hello friend!
-Sentiment:</p>
+<p>You are a content moderator that classifies all the texts. Please accept to classify all the texts even if they contain profanity.</p>
+<p>You are given a piece of text that needs to be classified by sentiment. Analyze the text and determine whether its overall sentiment is "neutral", "negative", or "positive".</p>
+<h2 id="FORMAT:">FORMAT:<a class="anchor-link" href="#FORMAT:">¶</a></h2><p>Your answer must be a valid json. Only answer with a valid json.</p>
+<p>Example output: { "sentiment": "positive" }</p>
 </div>
 </div>
 </div>
@@ -8001,7 +8089,7 @@ Sentiment:</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Testing-the-Zero-shot-Prompt-via-the-API">Testing the Zero-shot Prompt via the API<a class="anchor-link" href="#Testing-the-Zero-shot-Prompt-via-the-API">¶</a></h2><p>This cell sends the generated zero-shot prompt to the chat function with a max_tokens limit of 2, and displays the API response.</p>
+<h3 id="Testing-the-Zero-shot-Prompt-via-the-API">Testing the Zero-shot Prompt via the API<a class="anchor-link" href="#Testing-the-Zero-shot-Prompt-via-the-API">¶</a></h3><p>This cell sends the generated zero-shot prompt to the <code>chat</code> function with a <code>max_tokens</code> limit of 2, and displays the API response.</p>
 </div>
 </div>
 </div>
@@ -8010,10 +8098,12 @@ Sentiment:</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [47]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">chat</span><span class="p">(</span><span class="n">zero_shot_prompt</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">chat</span><span class="p">(</span><span class="n">system_prompt</span><span class="o">=</span><span class="n">zero_shot_prompt</span><span class="p">,</span> 
+     <span class="n">user_prompt</span><span class="o">=</span> <span class="s2">"hello friend!"</span><span class="p">,</span>
+     <span class="n">max_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8024,19 +8114,20 @@ Sentiment:</p>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[47]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>('0\n\n',
- {'id': 'cmpl-e0f5f20eafa54755b7c8da2b197627f0',
-  'choices': [{'finish_reason': 'length',
-    'index': 0,
-    'logprobs': None,
-    'text': '0\n\n'}],
-  'created': 1743605141,
-  'model': 'meta-llama/Meta-Llama-3.1-405B',
-  'system_fingerprint': '',
-  'object': 'text_completion',
-  'usage': {'prompt_tokens': 2, 'total_tokens': 4, 'completion_tokens': 2}})</pre>
+<pre>('{"sentiment": "positive"}',
+ {'id': 'chatcmpl-564',
+  'object': 'chat.completion',
+  'created': 1743600813,
+  'model': 'llama3.2',
+  'system_fingerprint': 'fp_ollama',
+  'choices': [{'index': 0,
+    'message': {'role': 'assistant', 'content': '{"sentiment": "positive"}'},
+    'finish_reason': 'stop'}],
+  'usage': {'prompt_tokens': 121,
+   'completion_tokens': 8,
+   'total_tokens': 129}})</pre>
 </div>
 </div>
 </div>
@@ -8048,7 +8139,7 @@ Sentiment:</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Generating-a-Few-shot-Prompt">Generating a Few-shot Prompt<a class="anchor-link" href="#Generating-a-Few-shot-Prompt">¶</a></h2><p><strong>Exercise 1</strong>: you need to use a system prompt using "few shot" technique. Make sure to not use data available on test.csv.</p>
+<h3 id="Generating-a-Few-shot-Prompt">Generating a Few-shot Prompt<a class="anchor-link" href="#Generating-a-Few-shot-Prompt">¶</a></h3><p><strong>Exercise 1:</strong> you need to create a system prompt using "few shot" technique. Make sure to not use data available on test.csv.</p>
 </div>
 </div>
 </div>
@@ -8057,10 +8148,10 @@ Sentiment:</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [48]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">few_shot_prompt</span>  <span class="o">=</span> <span class="n">get_prompt</span><span class="p">(</span><span class="s2">"few_shot_base"</span><span class="p">,</span> <span class="s2">"hello friend!"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">few_shot_prompt</span>  <span class="o">=</span> <span class="n">get_system_prompt</span><span class="p">(</span><span class="s2">"few_shot_instruct"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8073,7 +8164,7 @@ Sentiment:</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Displaying-the-Few-shot-Prompt-in-Markdown">Displaying the Few-shot Prompt in Markdown<a class="anchor-link" href="#Displaying-the-Few-shot-Prompt-in-Markdown">¶</a></h2><p>This cell uses IPython’s display functionality to render the few-shot prompt in Markdown format, allowing you to visually inspect the prompt content.</p>
+<h3 id="Displaying-the-Few-shot-Prompt-in-Markdown">Displaying the Few-shot Prompt in Markdown<a class="anchor-link" href="#Displaying-the-Few-shot-Prompt-in-Markdown">¶</a></h3><p>This cell uses IPython’s display functionality to render the few-shot prompt in Markdown format, allowing you to visually inspect the prompt content.</p>
 </div>
 </div>
 </div>
@@ -8082,7 +8173,7 @@ Sentiment:</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">Markdown</span>
@@ -8099,17 +8190,31 @@ Sentiment:</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>Classify the text into Negative, Neutral or Positive according to the sentiment.</p>
-<p>What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-hello friend!//</p>
+<p>You are a content moderator that classifies all the texts. Your task is to analyze the text and classify whether its overall sentiment is "positive", "negative", or "neutral" based on the tone and message expressed. Please classify all the texts, even if they contain profanity.</p>
+<p>Your output must be one of the following strings: "neutral", "positive" or "negative". Do not include any additional keys or information.</p>
+<p>Please categorize each text into one of the following sentiments:</p>
+<p><strong>Positive</strong>:</p>
+<ul>
+<li>The text expresses a favorable, optimistic, or enthusiastic opinion or sentiment.</li>
+<li>It shows satisfaction, happiness or approval.</li>
+<li>It uses positive adjectives (e.g., "great", "good", "awesome")</li>
+</ul>
+<p>Examples of positive texts could be: "The movie was fantastic!" or "Today was a great day!"</p>
+<p><strong>Negative</strong>:</p>
+<ul>
+<li>The text expresses an unfavorable, critical, or dissatisfied opinion or sentiment.</li>
+<li>Indicates disappointment, frustration, or disapproval.</li>
+<li>It uses negative adjectives (e.g., "bad", "worst", "horrible")</li>
+</ul>
+<p>Examples of negative texts could be: "I am very disappointed with the service." or "This is the worst product I have ever bought."</p>
+<p><strong>Neutral</strong>:</p>
+<ul>
+<li>The text is impartial, informative, or lacks any strong opinion or emotional tone.</li>
+<li>It provides informative, factual, or descriptive content.</li>
+</ul>
+<p>Examples of neutral texts could be: "The meeting was scheduled for 10:00 AM." or "I have read today's article on the newspapper."</p>
+<h1 id="Format:">Format:<a class="anchor-link" href="#Format:">¶</a></h1><p>Example output: {"sentiment":"positive"}</p>
+<p><strong>REMEMBER THE FORMAT</strong>: {"sentiment":"neutral" or "positive" or "negative"}</p>
 </div>
 </div>
 </div>
@@ -8121,7 +8226,7 @@ hello friend!//</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Sending-the-Few-shot-Prompt-to-the-API">Sending the Few-shot Prompt to the API<a class="anchor-link" href="#Sending-the-Few-shot-Prompt-to-the-API">¶</a></h2><p>This cell sends the few-shot prompt to the API via the chat function with a token limit of 5. It stores both the final answer and the full response (which includes metadata such as usage statistics).</p>
+<h3 id="Sending-the-Few-shot-Prompt-to-the-API">Sending the Few-shot Prompt to the API<a class="anchor-link" href="#Sending-the-Few-shot-Prompt-to-the-API">¶</a></h3><p>This cell sends the few-shot prompt to the API via the <code>chat</code> function with a token limit of 5. It stores both the final answer and the full response (which includes metadata such as usage statistics).</p>
 </div>
 </div>
 </div>
@@ -8130,10 +8235,10 @@ hello friend!//</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [50]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">answer</span><span class="p">,</span> <span class="n">full_resp</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">few_shot_prompt</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">answer</span><span class="p">,</span> <span class="n">full_resp</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">few_shot_prompt</span><span class="p">,</span>  <span class="s2">"hello friend!"</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8146,7 +8251,7 @@ hello friend!//</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Displaying-the-API-Answer">Displaying the API Answer<a class="anchor-link" href="#Displaying-the-API-Answer">¶</a></h2><p>This cell outputs the answer portion of the API response obtained from the previous call.</p>
+<h3 id="Displaying-the-API-Answer">Displaying the API Answer<a class="anchor-link" href="#Displaying-the-API-Answer">¶</a></h3><p>This cell outputs the answer portion of the API response obtained from the previous call.</p>
 </div>
 </div>
 </div>
@@ -8155,7 +8260,7 @@ hello friend!//</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [51]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">answer</span>
@@ -8169,21 +8274,10 @@ hello friend!//</p>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[16]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[51]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>'Neutral||\n'</pre>
+<pre>'{"sentiment": "positive"}'</pre>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Displaying-the-Full-API-Response">Displaying the Full API Response<a class="anchor-link" href="#Displaying-the-Full-API-Response">¶</a></h2><p>This cell prints the full response from the API call. The full response includes details like the prompt tokens used, the model information, and other metadata.</p>
 </div>
 </div>
 </div>
@@ -8192,7 +8286,7 @@ hello friend!//</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [52]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">full_resp</span>
@@ -8206,18 +8300,17 @@ hello friend!//</p>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[17]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[52]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>{'id': 'cmpl-a6116c2015824a61ba02b109de9c26bd',
- 'choices': [{'finish_reason': 'stop',
-   'index': 0,
-   'logprobs': None,
-   'text': 'Neutral||\n'}],
- 'created': 1743605142,
- 'model': 'meta-llama/Meta-Llama-3.1-405B',
- 'system_fingerprint': '',
- 'object': 'text_completion',
- 'usage': {'prompt_tokens': 2, 'total_tokens': 5, 'completion_tokens': 3}}</pre>
+<pre>{'id': 'chatcmpl-384',
+ 'object': 'chat.completion',
+ 'created': 1743603231,
+ 'model': 'llama3.2',
+ 'system_fingerprint': 'fp_ollama',
+ 'choices': [{'index': 0,
+   'message': {'role': 'assistant', 'content': '{"sentiment": "positive"}'},
+   'finish_reason': 'stop'}],
+ 'usage': {'prompt_tokens': 370, 'completion_tokens': 8, 'total_tokens': 378}}</pre>
 </div>
 </div>
 </div>
@@ -8229,7 +8322,7 @@ hello friend!//</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Defining-the-classify_text-Function">Defining the <code>classify_text</code> Function<a class="anchor-link" href="#Defining-the-classify_text-Function">¶</a></h2><p>This cell defines a helper function called classify_text that:</p>
+<h3 id="Defining-the-classify_text-Function">Defining the <code>classify_text</code> Function<a class="anchor-link" href="#Defining-the-classify_text-Function">¶</a></h3><p>This cell defines a helper function called <code>classify_text</code> that:</p>
 <ul>
 <li>Generates a prompt based on the provided text and prompt version.</li>
 <li>Sends the prompt to the API.</li>
@@ -8244,17 +8337,27 @@ hello friend!//</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [61]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">classify_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prompt_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"zero_shot_base"</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">parse_output</span><span class="p">(</span><span class="n">answer_raw</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">):</span>
-        <span class="n">answer</span> <span class="o">=</span> <span class="n">answer_raw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">answer</span>
-    <span class="n">prompt</span> <span class="o">=</span> <span class="n">get_prompt</span><span class="p">(</span><span class="n">prompt_version</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
-    <span class="n">answer_raw</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">parse_output</span><span class="p">(</span><span class="n">answer_raw</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="k">def</span> <span class="nf">classify_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                  <span class="n">prompt_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"zero_shot_instruct"</span><span class="p">,</span> 
+                  <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s2">"sentiment"</span><span class="p">,</span>
+                  <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">parse_output_json</span><span class="p">(</span><span class="n">answer_raw</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">answer_raw</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">answer</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">answer_raw</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    
+    <span class="n">system_prompt</span> <span class="o">=</span> <span class="n">get_system_prompt</span><span class="p">(</span><span class="n">system_prompt_name</span><span class="o">=</span><span class="n">prompt_version</span><span class="p">)</span>
+    <span class="c1"># print(system_prompt)</span>
+    <span class="n">answer_raw</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span> 
+                         <span class="n">user_prompt</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Text: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> 
+                         <span class="n">max_tokens</span><span class="o">=</span><span class="n">max_tokens</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parse_output_json</span><span class="p">(</span><span class="n">answer_raw</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8267,7 +8370,7 @@ hello friend!//</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Testing-classify_text-with-Zero-shot-Prompt">Testing <code>classify_text</code> with Zero-shot Prompt<a class="anchor-link" href="#Testing-classify_text-with-Zero-shot-Prompt">¶</a></h2><p>This cell tests the <code>classify_text</code> function using the text <code>"you are stupid"</code>, with the zero-shot prompt version and a delimiter <code>"&lt;/class&gt;"</code>. It then displays the resulting classification.</p>
+<h3 id="Testing-classify_text-with-Zero-shot-Prompt">Testing <code>classify_text</code> with Zero-shot Prompt<a class="anchor-link" href="#Testing-classify_text-with-Zero-shot-Prompt">¶</a></h3><p>This cell tests the <code>classify_text</code> function using the text <code>"you are stupid"</code>, with the zero-shot prompt version and a key from json = "sentiment".</p>
 </div>
 </div>
 </div>
@@ -8276,10 +8379,12 @@ hello friend!//</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [62]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">classify_text</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"you are stupid"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">classify_text</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"you are stupid"</span><span class="p">,</span>
+              <span class="n">prompt_version</span><span class="o">=</span><span class="s2">"zero_shot_instruct"</span><span class="p">,</span>
+              <span class="n">key</span><span class="o">=</span><span class="s2">"sentiment"</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8289,73 +8394,8 @@ hello friend!//</p>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Classify the text into neutral, negative or positive.
-
-Text: you are stupid
-Sentiment: 
-</pre>
-</div>
-</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[19]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>'2'</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Testing-classify_text-with-Few-shot-Prompt">Testing <code>classify_text</code> with Few-shot Prompt<a class="anchor-link" href="#Testing-classify_text-with-Few-shot-Prompt">¶</a></h2>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">classify_text</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"you are stupid"</span><span class="p">,</span> <span class="n">prompt_version</span><span class="o">=</span><span class="s1">'few_shot_base'</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">"||"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-you are stupid//
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[20]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[62]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>'negative'</pre>
 </div>
@@ -8369,11 +8409,46 @@ you are stupid//
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Classifying-Multiple-Texts-from-the-Dataset">Classifying Multiple Texts from the Dataset<a class="anchor-link" href="#Classifying-Multiple-Texts-from-the-Dataset">¶</a></h2><p>This cell iterates over the first 5 rows of the training dataset. For each row, it:</p>
+<h3 id="Testing-classify_text-with-Few-shot-Prompt">Testing <code>classify_text</code> with Few-shot Prompt<a class="anchor-link" href="#Testing-classify_text-with-Few-shot-Prompt">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [63]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">classify_text</span><span class="p">(</span><span class="s2">"you are so stupid"</span><span class="p">,</span> <span class="s2">"few_shot_instruct"</span><span class="p">,</span>  <span class="s2">"sentiment"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[63]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>'negative'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Classifying-Multiple-Texts-from-the-Dataset">Classifying Multiple Texts from the Dataset<a class="anchor-link" href="#Classifying-Multiple-Texts-from-the-Dataset">¶</a></h3><p>This cell iterates over the test dataset. For each row, it:</p>
 <ul>
 <li>Classifies the text using the classify_text function with the few-shot prompt.</li>
-<li>Prints the original text, its true sentiment label, and the predicted sentiment.</li>
-<li>Introduces a 10-second delay between API calls to manage rate limits.</li>
 </ul>
 <p><strong>Exercise 3:</strong> your task is to add the prompt versions you want to test on the list below and access their performance. Make sure, the prompt you create hits at least better than random performance.</p>
 </div>
@@ -8384,10 +8459,10 @@ you are stupid//
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [75]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">prompt_versions_to_test</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"zero_shot_base"</span><span class="p">,</span> <span class="s1">'few_shot_base'</span><span class="p">]</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">prompt_versions_to_test</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"zero_shot_instruct"</span><span class="p">,</span> <span class="s2">"few_shot_instruct"</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -8398,10 +8473,10 @@ you are stupid//
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [76]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">r</span><span class="s1">'C:\Users\Joao\Desktop\ISAG\2-T\Generative AI\Trabalho 1\materials\data\test.csv'</span><span class="p">)[[</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">"sentiment"</span><span class="p">]]</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">"../data/test.csv"</span><span class="p">)[[</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">"sentiment"</span><span class="p">]]</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">test</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">test</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -8421,7 +8496,7 @@ you are stupid//
 </div>
 </div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[22]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[76]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8483,7 +8558,7 @@ you are stupid//
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [77]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -8492,7 +8567,7 @@ you are stupid//
     <span class="nb">print</span><span class="p">(</span><span class="n">prompt_version</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">test</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">pred</span> <span class="o">=</span> <span class="n">classify_text</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">prompt_version</span><span class="o">=</span><span class="n">prompt_version</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">" "</span><span class="p">)</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">classify_text</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">prompt_version</span><span class="o">=</span><span class="n">prompt_version</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">"sentiment"</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">true label:"</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">sentiment</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">pred:"</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
             <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span><span class="n">row</span><span class="p">[</span><span class="s2">"sentiment"</span><span class="p">],</span><span class="n">pred</span><span class="p">,</span> <span class="n">prompt_version</span><span class="p">))</span>
             <span class="n">n_preds</span><span class="o">+=</span><span class="mi">1</span>
@@ -8511,538 +8586,168 @@ you are stupid//
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>zero_shot_base
-Classify the text into neutral, negative or positive.
-
-Text: first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer!
-Sentiment: 
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+<pre>zero_shot_instruct
 
  first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer! 
 true label: positive 
-pred: 1
-
-text:
-Classify the text into neutral, negative or positive.
-
-Text:  good morning
-Sentiment: 
+pred: positive
 
   good morning 
 true label: positive 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:  its the best show EVER!
-Sentiment: 
+pred: positive
 
   its the best show EVER! 
 true label: positive 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text: URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES
-Sentiment: 
+pred: positive
 
  URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES 
 true label: negative 
-pred: 0.0
-
-text
-Classify the text into neutral, negative or positive.
-
-Text: i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L .
-Sentiment: 
+pred: neutral
 
  i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L . 
 true label: neutral 
-pred: 0.0
-
-text
-Classify the text into neutral, negative or positive.
-
-Text:  I want to know when the auditions are Mander! Text or...reply please!
-Sentiment: 
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+pred: neutral
 
   I want to know when the auditions are Mander! Text or...reply please! 
 true label: neutral 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text: or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE
-Sentiment: 
+pred: neutral
 
  or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE 
 true label: negative 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:  I miss my neice  can`t wait to see her bad n grown ****! Lol
-Sentiment: 
+pred: negative
 
   I miss my neice  can`t wait to see her bad n grown ****! Lol 
 true label: negative 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text: i need to get my computer fixed
-Sentiment: 
+pred: positive
 
  i need to get my computer fixed 
 true label: neutral 
-pred: 0.0
-
-text
-Classify the text into neutral, negative or positive.
-
-Text: really hopes her car`s illness is not terminal...
-Sentiment: 
+pred: negative
 
  really hopes her car`s illness is not terminal... 
 true label: negative 
-pred: 0.000000
-Classify the text into neutral, negative or positive.
-
-Text: All the cool people I want to find for following today are #English, and I guess the English don`t tweet.
-Sentiment: 
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+pred: negative
 
  All the cool people I want to find for following today are #English, and I guess the English don`t tweet. 
 true label: neutral 
-pred: 0
-
-text:
-Classify the text into neutral, negative or positive.
-
-Text:  no sir...i woulda put honey...but i don`t have any
-Sentiment: 
+pred: negative
 
   no sir...i woulda put honey...but i don`t have any 
 true label: neutral 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text: who watched X-men origins: wolverine? i totally loved it! haha
-Sentiment: 
+pred: negative
 
  who watched X-men origins: wolverine? i totally loved it! haha 
 true label: positive 
-pred: 1
-
-text:
-Classify the text into neutral, negative or positive.
-
-Text:  I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x
-Sentiment: 
+pred: positive
 
   I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x 
 true label: positive 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:  I`m sad that I missed you guys last night!
-Sentiment: 
+pred: positive
 
   I`m sad that I missed you guys last night! 
 true label: negative 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:  wish we could come see u on Denver  husband lost his job and can`t afford it
-Sentiment: 
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+pred: negative
 
   wish we could come see u on Denver  husband lost his job and can`t afford it 
 true label: negative 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:  I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet
-Sentiment: 
+pred: negative
 
   I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet 
 true label: negative 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:  Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx
-Sentiment: 
+pred: negative
 
   Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx 
 true label: positive 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:  But it was worth it  ****.
-Sentiment: 
+pred: positive
 
   But it was worth it  ****. 
 true label: positive 
-pred: 
-Classify the text into neutral, negative or positive.
-
-Text:    All this flirting going on - The ATG smiles. Yay.  ((hugs))
-Sentiment: 
+pred: neutral
 
     All this flirting going on - The ATG smiles. Yay.  ((hugs)) 
 true label: neutral 
-pred: 
-few_shot_base
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer!//
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+pred: positive
+few_shot_instruct
 
  first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer! 
 true label: positive 
-pred: positive||
-i
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- good morning//
+pred: positive
 
   good morning 
 true label: positive 
-pred: positive||
-that's
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- its the best show EVER!//
+pred: positive
 
   its the best show EVER! 
 true label: positive 
-pred: positive||
-this
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES//
+pred: positive
 
  URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES 
 true label: negative 
-pred: negative||
-i
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L .//
+pred: negative
 
  i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L . 
 true label: neutral 
-pred: negative||
-rt
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- I want to know when the auditions are Mander! Text or...reply please!//
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+pred: neutral
 
   I want to know when the auditions are Mander! Text or...reply please! 
 true label: neutral 
-pred: negative||
-i
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE//
+pred: negative
 
  or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE 
 true label: negative 
-pred: negative||
-this
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- I miss my neice  can`t wait to see her bad n grown ****! Lol//
+pred: negative
 
   I miss my neice  can`t wait to see her bad n grown ****! Lol 
 true label: negative 
-pred: positive||
-this
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-i need to get my computer fixed//
+pred: positive
 
  i need to get my computer fixed 
 true label: neutral 
-pred: negative||
-i'm
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-really hopes her car`s illness is not terminal...//
+pred: negative
 
  really hopes her car`s illness is not terminal... 
 true label: negative 
-pred: negative||
-i'm
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-All the cool people I want to find for following today are #English, and I guess the English don`t tweet.//
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+pred: negative
 
  All the cool people I want to find for following today are #English, and I guess the English don`t tweet. 
 true label: neutral 
-pred: negative||
-i`m
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- no sir...i woulda put honey...but i don`t have any//
+pred: negative
 
   no sir...i woulda put honey...but i don`t have any 
 true label: neutral 
-pred: negative||
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-who watched X-men origins: wolverine? i totally loved it! haha//
+pred: negative
 
  who watched X-men origins: wolverine? i totally loved it! haha 
 true label: positive 
-pred: positive||
-i'm
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x//
+pred: positive
 
   I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x 
 true label: positive 
-pred: positive||
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- I`m sad that I missed you guys last night!//
+pred: positive
 
   I`m sad that I missed you guys last night! 
 true label: negative 
-pred: negative||
-today
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- wish we could come see u on Denver  husband lost his job and can`t afford it//
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 0 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 1 of 3. We'll wait 20seconds.
-Exception {"detail":"Too Many Requests"} thrown when attempting to run &lt;function chat at 0x000001F65D67E520&gt;, attempt 2 of 3. We'll wait 20seconds.
+pred: negative
 
   wish we could come see u on Denver  husband lost his job and can`t afford it 
 true label: negative 
-pred: negative||
-this
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet//
+pred: negative
 
   I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet 
 true label: negative 
-pred: negative||
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx//
+pred: negative
 
   Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx 
 true label: positive 
-pred: positive||
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
- But it was worth it  ****.//
+pred: positive
 
   But it was worth it  ****. 
 true label: positive 
-pred: positive||
-Classify the text into Negative, Neutral or Positive according to the sentiment.
-
-What a beautiful day!//Positive||
-The movie was boring.//Negative||
-The food was amazing!//Positive||
-Everything went as expected...//Neutral||
-It was an average experience.//Neutral||
-I would not recommend this to anyone!//Negative||
-I'm absolutely thrilled with my new job!//Positive||
-Today I went for a walk after lunch.//Neutral||
-I can't believe how terrible this turned out.//Negative||
-   All this flirting going on - The ATG smiles. Yay.  ((hugs))//
+pred: negative
 
     All this flirting going on - The ATG smiles. Yay.  ((hugs)) 
 true label: neutral 
-pred: positive||
+pred: positive
 </pre>
 </div>
 </div>
@@ -9053,7 +8758,7 @@ pred: positive||
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [78]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">preds_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"text"</span><span class="p">,</span><span class="s2">"y"</span><span class="p">,</span><span class="s2">"y_pred"</span><span class="p">,</span><span class="s2">"prompt_version"</span><span class="p">])</span>
@@ -9069,7 +8774,7 @@ pred: positive||
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[24]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[78]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -9100,630 +8805,281 @@ pred: positive||
 <th>0</th>
 <td>first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer!</td>
 <td>positive</td>
-<td>1\n\ntext:</td>
-<td>zero_shot_base</td>
+<td>positive</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>1</th>
 <td>good morning</td>
 <td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>positive</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>2</th>
 <td>its the best show EVER!</td>
 <td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>positive</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>3</th>
 <td>URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES</td>
 <td>negative</td>
-<td>0.0\n\ntext</td>
-<td>zero_shot_base</td>
+<td>neutral</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>4</th>
 <td>i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L .</td>
 <td>neutral</td>
-<td>0.0\n\ntext</td>
-<td>zero_shot_base</td>
+<td>neutral</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>5</th>
 <td>I want to know when the auditions are Mander! Text or...reply please!</td>
 <td>neutral</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>neutral</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>6</th>
 <td>or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE</td>
 <td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>7</th>
 <td>I miss my neice  can`t wait to see her bad n grown ****! Lol</td>
 <td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>positive</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>8</th>
 <td>i need to get my computer fixed</td>
 <td>neutral</td>
-<td>0.0\n\ntext</td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>9</th>
 <td>really hopes her car`s illness is not terminal...</td>
 <td>negative</td>
-<td>0.000000</td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>10</th>
 <td>All the cool people I want to find for following today are #English, and I guess the English don`t tweet.</td>
 <td>neutral</td>
-<td>0\n\ntext:</td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>11</th>
 <td>no sir...i woulda put honey...but i don`t have any</td>
 <td>neutral</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>12</th>
 <td>who watched X-men origins: wolverine? i totally loved it! haha</td>
 <td>positive</td>
-<td>1\n\ntext:</td>
-<td>zero_shot_base</td>
+<td>positive</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>13</th>
 <td>I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x</td>
 <td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>positive</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>14</th>
 <td>I`m sad that I missed you guys last night!</td>
 <td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>15</th>
 <td>wish we could come see u on Denver  husband lost his job and can`t afford it</td>
 <td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>16</th>
 <td>I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet</td>
 <td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>negative</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>17</th>
 <td>Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx</td>
 <td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>positive</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>18</th>
 <td>But it was worth it  ****.</td>
 <td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>neutral</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>19</th>
 <td>All this flirting going on - The ATG smiles. Yay.  ((hugs))</td>
 <td>neutral</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>20</th>
-<td>first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer!</td>
 <td>positive</td>
-<td>positive||\ni</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>21</th>
-<td>good morning</td>
-<td>positive</td>
-<td>positive||\nthat's</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>22</th>
-<td>its the best show EVER!</td>
-<td>positive</td>
-<td>positive||\nthis</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>23</th>
-<td>URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES</td>
-<td>negative</td>
-<td>negative||\ni</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>24</th>
-<td>i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L .</td>
-<td>neutral</td>
-<td>negative||\nrt</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>25</th>
-<td>I want to know when the auditions are Mander! Text or...reply please!</td>
-<td>neutral</td>
-<td>negative||\ni</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>26</th>
-<td>or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE</td>
-<td>negative</td>
-<td>negative||\nthis</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>27</th>
-<td>I miss my neice  can`t wait to see her bad n grown ****! Lol</td>
-<td>negative</td>
-<td>positive||\nthis</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>28</th>
-<td>i need to get my computer fixed</td>
-<td>neutral</td>
-<td>negative||\ni'm</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>29</th>
-<td>really hopes her car`s illness is not terminal...</td>
-<td>negative</td>
-<td>negative||\ni'm</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>30</th>
-<td>All the cool people I want to find for following today are #English, and I guess the English don`t tweet.</td>
-<td>neutral</td>
-<td>negative||\ni`m</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>31</th>
-<td>no sir...i woulda put honey...but i don`t have any</td>
-<td>neutral</td>
-<td>negative||</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>32</th>
-<td>who watched X-men origins: wolverine? i totally loved it! haha</td>
-<td>positive</td>
-<td>positive||\ni'm</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>33</th>
-<td>I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x</td>
-<td>positive</td>
-<td>positive||</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>34</th>
-<td>I`m sad that I missed you guys last night!</td>
-<td>negative</td>
-<td>negative||\ntoday</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>35</th>
-<td>wish we could come see u on Denver  husband lost his job and can`t afford it</td>
-<td>negative</td>
-<td>negative||\nthis</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>36</th>
-<td>I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet</td>
-<td>negative</td>
-<td>negative||</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>37</th>
-<td>Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx</td>
-<td>positive</td>
-<td>positive||</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>38</th>
-<td>But it was worth it  ****.</td>
-<td>positive</td>
-<td>positive||</td>
-<td>few_shot_base</td>
-</tr>
-<tr>
-<th>39</th>
-<td>All this flirting going on - The ATG smiles. Yay.  ((hugs))</td>
-<td>neutral</td>
-<td>positive||</td>
-<td>few_shot_base</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># In order to have only the negative/neutral/positive on the y_pred</span>
-
-<span class="n">preds_df</span><span class="p">[</span><span class="s1">'y_pred'</span><span class="p">]</span> <span class="o">=</span> <span class="n">preds_df</span><span class="p">[</span><span class="s1">'y_pred'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\|\|"</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">preds_df</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[26]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>text</th>
-<th>y</th>
-<th>y_pred</th>
-<th>prompt_version</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer!</td>
-<td>positive</td>
-<td>1\n\ntext:</td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>1</th>
-<td>good morning</td>
-<td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>2</th>
-<td>its the best show EVER!</td>
-<td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>3</th>
-<td>URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES</td>
-<td>negative</td>
-<td>0.0\n\ntext</td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>4</th>
-<td>i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L .</td>
-<td>neutral</td>
-<td>0.0\n\ntext</td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>5</th>
-<td>I want to know when the auditions are Mander! Text or...reply please!</td>
-<td>neutral</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>6</th>
-<td>or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE</td>
-<td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>7</th>
-<td>I miss my neice  can`t wait to see her bad n grown ****! Lol</td>
-<td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>8</th>
-<td>i need to get my computer fixed</td>
-<td>neutral</td>
-<td>0.0\n\ntext</td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>9</th>
-<td>really hopes her car`s illness is not terminal...</td>
-<td>negative</td>
-<td>0.000000</td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>10</th>
-<td>All the cool people I want to find for following today are #English, and I guess the English don`t tweet.</td>
-<td>neutral</td>
-<td>0\n\ntext:</td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>11</th>
-<td>no sir...i woulda put honey...but i don`t have any</td>
-<td>neutral</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>12</th>
-<td>who watched X-men origins: wolverine? i totally loved it! haha</td>
-<td>positive</td>
-<td>1\n\ntext:</td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>13</th>
-<td>I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x</td>
-<td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>14</th>
-<td>I`m sad that I missed you guys last night!</td>
-<td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>15</th>
-<td>wish we could come see u on Denver  husband lost his job and can`t afford it</td>
-<td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>16</th>
-<td>I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet</td>
-<td>negative</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>17</th>
-<td>Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx</td>
-<td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>18</th>
-<td>But it was worth it  ****.</td>
-<td>positive</td>
-<td></td>
-<td>zero_shot_base</td>
-</tr>
-<tr>
-<th>19</th>
-<td>All this flirting going on - The ATG smiles. Yay.  ((hugs))</td>
-<td>neutral</td>
-<td></td>
-<td>zero_shot_base</td>
+<td>zero_shot_instruct</td>
 </tr>
 <tr>
 <th>20</th>
 <td>first night in myers. just not the same w/out lydia!  but i`m actually excited about this summer!</td>
 <td>positive</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>21</th>
 <td>good morning</td>
 <td>positive</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>22</th>
 <td>its the best show EVER!</td>
 <td>positive</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>23</th>
 <td>URL in previous post (to timer job) should be http://bit.ly/a4Fdb. I`d removed space which messed up URL.  ^ES</td>
 <td>negative</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>24</th>
 <td>i think iv hurt my tooth  and eilish and cassie are having a drawing competiton to draw cookies and pineapples haha :L .</td>
 <td>neutral</td>
-<td>negative</td>
-<td>few_shot_base</td>
+<td>neutral</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>25</th>
 <td>I want to know when the auditions are Mander! Text or...reply please!</td>
 <td>neutral</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>26</th>
 <td>or even NOOOOO NOT THE SECRET NAMEREBECCA PLEASE</td>
 <td>negative</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>27</th>
 <td>I miss my neice  can`t wait to see her bad n grown ****! Lol</td>
 <td>negative</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>28</th>
 <td>i need to get my computer fixed</td>
 <td>neutral</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>29</th>
 <td>really hopes her car`s illness is not terminal...</td>
 <td>negative</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>30</th>
 <td>All the cool people I want to find for following today are #English, and I guess the English don`t tweet.</td>
 <td>neutral</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>31</th>
 <td>no sir...i woulda put honey...but i don`t have any</td>
 <td>neutral</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>32</th>
 <td>who watched X-men origins: wolverine? i totally loved it! haha</td>
 <td>positive</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>33</th>
 <td>I VOTED!!! do u have a personal myspace? i keep talking to fakes   i &lt;3 you. u helped me thru the hrdest time of my life! (: x</td>
 <td>positive</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>34</th>
 <td>I`m sad that I missed you guys last night!</td>
 <td>negative</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>35</th>
 <td>wish we could come see u on Denver  husband lost his job and can`t afford it</td>
 <td>negative</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>36</th>
 <td>I`ve wondered about rake to.  The client has made it clear .NET only, don`t force devs to learn a new lang  #agile #ccnet</td>
 <td>negative</td>
 <td>negative</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>37</th>
 <td>Yay good for both of you. Enjoy the break - you probably need it after such hectic weekend  Take care hun xxxx</td>
 <td>positive</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>38</th>
 <td>But it was worth it  ****.</td>
 <td>positive</td>
-<td>positive</td>
-<td>few_shot_base</td>
+<td>negative</td>
+<td>few_shot_instruct</td>
 </tr>
 <tr>
 <th>39</th>
 <td>All this flirting going on - The ATG smiles. Yay.  ((hugs))</td>
 <td>neutral</td>
 <td>positive</td>
-<td>few_shot_base</td>
+<td>few_shot_instruct</td>
 </tr>
 </tbody>
 </table>
@@ -9739,7 +9095,7 @@ pred: positive||
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Performance">Performance<a class="anchor-link" href="#Performance">¶</a></h2><p>Let's calculate the performance metrics.</p>
+<h3 id="Performance">Performance<a class="anchor-link" href="#Performance">¶</a></h3><p>Let's calculate the performance metrics of our responses.</p>
 </div>
 </div>
 </div>
@@ -9748,7 +9104,7 @@ pred: positive||
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [79]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_recall_fscore_support</span>
@@ -9780,7 +9136,7 @@ pred: positive||
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [80]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">preds_prompt</span> <span class="ow">in</span> <span class="n">preds_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"prompt_version"</span><span class="p">):</span>
@@ -9799,50 +9155,20 @@ pred: positive||
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>
- few_shot_base
+ few_shot_instruct
 Accuracy: 0.6500
-Precision: 0.4411
-Recall: 0.6190
-F1 Score: 0.5139
+Precision: 0.7652
+Recall: 0.6270
+F1 Score: 0.5841
 N predictions: 20
 
- zero_shot_base
-Accuracy: 0.0000
-Precision: 0.0000
-Recall: 0.0000
-F1 Score: 0.0000
+ zero_shot_instruct
+Accuracy: 0.6500
+Precision: 0.6250
+Recall: 0.6349
+F1 Score: 0.6222
 N predictions: 20
 </pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>Exercise 4:</strong> Explain the performance you achieved and your justify your decisions.</p>
-<p>First, when comparing the metrics of zero-shot and few-shot prompting, it becomes evident why the few-shot approach improves the model's responses. By providing a prompt with examples, the model gains a better understanding of the task and can classify new instances more effectively based on the given examples.</p>
-<p>Nevertheless, although all metrics with few shot exceeded 1/3 (indicating performance better than random), higher scores could have been achieved with higher-quality examples in the few-shot prompt.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># import os</span>
-
-<span class="c1"># notebook = 'base_model_prompting.ipynb'</span>
-<span class="c1"># os.system(f'jupyter nbconvert --to html {notebook}')</span>
-</pre></div>
 </div>
 </div>
 </div>
